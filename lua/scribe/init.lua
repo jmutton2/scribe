@@ -1,14 +1,19 @@
 local Path = require("plenary.path")
+local uv = vim.loop
 
 local data_path = vim.fn.stdpath("data")
-local cache_config = string.format("%s/scribe.json", data_path)
+local cache_config = string.format("%s/scribe.txt", data_path)
 
 local M = {}
 
-ScribeConfig = ScribeConfig or {}
+function M.save(content)
+	Path:new(cache_config):write(content or '', "w")
+end
 
-function M.save()
-	Path:new(cache_config):write(vim.fn.json_encode(ScribeConfig), "w")
+function M.load()
+	local data = Path:new(cache_config):read()
+
+	return data
 end
 
 return M

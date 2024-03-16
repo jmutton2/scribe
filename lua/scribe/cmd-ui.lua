@@ -7,7 +7,9 @@ Scribe_cmd_win_id = nil
 Scribe_cmd_bufh = nil
 
 local function close_menu()
-	scribe.save()
+	local content = vim.api.nvim_buf_get_lines(Scribe_cmd_bufh, 0, -1, false)
+
+	scribe.save(content)
 
     vim.api.nvim_win_close(Scribe_win_id, true)
 
@@ -50,7 +52,7 @@ function M.toggle_quick_menu()
 	end
 
 	local win_info = create_window()
-	local contents = {}
+	local contents = {scribe.load()}
 
 	Scribe_win_id = win_info.win_id
 	Scribe_bufh = win_info.bufnr

@@ -5,8 +5,10 @@ local M = {}
 Scribe_win_id = nil
 Scribe_bufh = nil
 
-local function close_menu(force_save)
-	scribe.save()
+local function close_menu()
+	local content = vim.api.nvim_buf_get_lines(Scribe_bufh, 0, -1, false)
+
+	scribe.save(content)
 
     vim.api.nvim_win_close(Scribe_win_id, true)
 
@@ -49,13 +51,11 @@ function M.toggle_quick_menu()
 	end
 
 	local win_info = create_window()
-	local contents = {}
+	local contents = {scribe.load()}
 
 	Scribe_win_id = win_info.win_id
 	Scribe_bufh = win_info.bufnr
 
-	-- TODO: get the contents from a file
-	-- TODO: save contents to a file
     vim.api.nvim_win_set_option(Scribe_win_id, "number", true)
     vim.api.nvim_buf_set_name(Scribe_bufh, "scribe-menu")
     vim.api.nvim_buf_set_lines(Scribe_bufh, 0, #contents, false, contents)
