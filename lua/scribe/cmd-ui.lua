@@ -7,9 +7,10 @@ Scribe_cmd_win_id = nil
 Scribe_cmd_bufh = nil
 
 local function close_menu()
-	local content = vim.api.nvim_buf_get_lines(Scribe_cmd_bufh, 0, -1, false)
+	local content = vim.api.nvim_buf_get_lines(Scribe_cmd_bufh, 0, vim.api.nvim_buf_line_count(0), false)
+    local content_formatted = table.concat(content, "\n")
 
-	scribe.save(content)
+	scribe.save(content_formatted)
 
     vim.api.nvim_win_close(Scribe_win_id, true)
 
