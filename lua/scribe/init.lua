@@ -6,8 +6,12 @@ local cache_config = string.format("%s/scribe.txt", data_path)
 
 local M = {}
 
-function M.save(content)
-	Path:new(cache_config):write(content or '', "w")
+function M.save(--[[required]]content, --[[optional]]save_directory)
+	if not save_directory then
+		save_directory = cache_config --default
+	end
+
+	Path:new(save_directory):write(content or '', "w")
 end
 
 function M.load()

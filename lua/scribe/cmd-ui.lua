@@ -6,12 +6,15 @@ local M = {}
 Scribe_cmd_win_id = nil
 Scribe_cmd_bufh = nil
 
-local function close_menu()
+local function save(--[[optional]]save_directory)
 	local content = vim.api.nvim_buf_get_lines(Scribe_cmd_bufh, 0, vim.api.nvim_buf_line_count(0), false)
     local content_formatted = table.concat(content, "\n")
 
-	scribe.save(content_formatted)
+	scribe.save(content_formatted, save_directory)
+end
 
+local function close_menu()
+	save()
     vim.api.nvim_win_close(Scribe_win_id, true)
 
     Scribe_cmd_win_id = nil
@@ -46,6 +49,14 @@ local function create_window()
     }
 end
 
+function M.save_cwd()
+	local data_path = vim.fn.expand("%")
+	local file_name = math.random(1,99999999999999)
+	local save_directory = string.format("%s/../%d.txt", data_path, file_name)
+
+	save(save_directory)
+end
+
 function M.toggle_quick_menu()
 	if Scribe_win_id ~= nil and vim.api.nvim_win_is_valid(Scribe_win_id) then
 		close_menu()
@@ -53,14 +64,20 @@ function M.toggle_quick_menu()
 	end
 
 	local win_info = create_window()
-	local contents = {scribe.load()}
+	local raw_content = scribe.load()
+
+	local contents = {}
+
+	for line in raw_content:gmatch("[^\r\n]+") do
+        table.insert(contents, line)
+    end
 
 	Scribe_win_id = win_info.win_id
 	Scribe_bufh = win_info.bufnr
 
     vim.api.nvim_win_set_option(Scribe_cmd_win_id, "number", true)
     vim.api.nvim_buf_set_name(Scribe_cmd_bufh, "scribe-cmd-menu")
-    vim.api.nvim_buf_set_lines(Scribe_cmd_bufh, 0, #contents, false, contents)
+    vim.api.nvim_buf_set_lines(Scribe_cmd_bufh, 0, -1, false, contents)
     vim.api.nvim_buf_set_option(Scribe_cmd_bufh, "filetype", "scribe")
     vim.api.nvim_buf_set_option(Scribe_cmd_bufh, "buftype", "acwrite")
     vim.api.nvim_buf_set_option(Scribe_cmd_bufh, "bufhidden", "delete")
