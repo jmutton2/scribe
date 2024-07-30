@@ -6,15 +6,11 @@ local M = {}
 Scribe_win_id = nil
 Scribe_bufh = nil
 
-local function save(--[[optional]]save_directory)
+local function close_menu(--[[optional]]save_directory)
 	local content = vim.api.nvim_buf_get_lines(Scribe_bufh, 0, vim.api.nvim_buf_line_count(0), false)
     local content_formatted = table.concat(content, "\n")
 
 	scribe.save(content_formatted, save_directory)
-end
-
-local function close_menu()
-	save()
     vim.api.nvim_win_close(Scribe_win_id, true)
 
     Scribe_win_id = nil
@@ -50,11 +46,8 @@ local function create_window()
 end
 
 function M.save_cwd()
-	local data_path = vim.fn.expand("%")
-	local file_name = math.random(1,99999999999999)
-	local save_directory = string.format("%s/../%d.txt", data_path, file_name)
-
-	save(save_directory)
+	local save_directory = true
+	close_menu(save_directory)
 end
 
 function M.toggle_quick_menu()
