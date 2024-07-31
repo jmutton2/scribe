@@ -9,7 +9,14 @@ function M.save(--[[required]]content, --[[optional]]save_directory)
 	if not save_directory then
 		save_directory = cache_config --default
 	else
-		save_directory = vim.fn.input("Save file as: ", vim.fn.expand("%:p:h") .. "/", "file")
+		local default_path = vim.fn.expand("%:p:h") .. "/"
+		save_directory = vim.fn.input("Save file as: ", default_path, "file")
+
+		-- Check if the user provided a filename or cancelled the input
+		if save_directory == "" then
+			print("Save operation cancelled.")
+			return
+		end
 	end
 
 	Path:new(save_directory):write(content or '', "w")
